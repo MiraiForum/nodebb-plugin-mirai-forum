@@ -1,0 +1,16 @@
+{
+    "library": "main.js",
+    "less": [],
+    "acpLess": [],
+    "modules": {},
+    "staticDirs": {},
+    "scripts": [],
+    "acpScripts": [],
+    "defaultLang": "en-US",
+    "hooks": [
+        {
+            "hook": "filter:privileges.posts.edit",
+            "method": "filter:privileges+posts+edit"
+        }
+    ]
+}

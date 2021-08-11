@@ -1,0 +1,9 @@
+{
+    "name": "nodebb-plugin-mirai-forum",
+    "version": "1.0.0",
+    "description": "Hi",
+    "main": "main.js",
+    "nbbpm": {
+      "compatibility": "^1.15.0"
+    }
+  }
