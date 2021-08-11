@@ -1,8 +1,19 @@
 
-let plugin = {};
-let topics = require.main.require('./src/topics');
-let posts = require.main.require('./src/posts');
-let user = require.main.require('./src/user');
+const plugin = {};
+const topics = require.main.require('./src/topics');
+const posts = require.main.require('./src/posts');
+const privsPosts = require.main.require('./src/privileges/posts');
+const user = require.main.require('./src/user');
+
+plugin["filter:privileges+groups+list"] = function (privileges, callback) {
+    privileges.push('groups:topics:edit-reply');
+    callback(null, privileges);
+};
+
+plugin["filter:privileges+groups+list_human"] = function (labels, callback) {
+    labels.push({ name: 'Edit reply' });
+    callback(null, labels);
+};
 
 async function getPostOwner(pid) {
     let pdata = await posts.getPostFields(pid, ['uid']);
@@ -16,6 +27,10 @@ plugin["filter:privileges+posts+edit"] = async function (event) {
 
     // Make topic authors can edit replys
     // But not allowed edit ADMINISTRATORS / MODERATORS replys
+
+    let hasEditReplyPerm = await privsPosts.can('topics:edit-reply', event.pid, event.uid);
+    if (!hasEditReplyPerm) return event;
+
 
     let postOwner = await getPostOwner(event.pid);
     let isAdmin = await user.isAdministrator(postOwner);

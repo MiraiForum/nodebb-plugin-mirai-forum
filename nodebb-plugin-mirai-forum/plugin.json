@@ -11,6 +11,18 @@
         {
             "hook": "filter:privileges.posts.edit",
             "method": "filter:privileges+posts+edit"
+        },
+        {
+            "hook": "filter:privileges.groups.list",
+            "method": "filter:privileges+groups+list"
+        },
+        {
+            "hook": "filter:privileges.groups.list_human",
+            "method": "filter:privileges+groups+list_human"
+        },
+        {
+            "hook": "filter:categories.copyPrivilegesFrom",
+            "method": "copyPrivilegesFrom"
         }
     ]
 }
