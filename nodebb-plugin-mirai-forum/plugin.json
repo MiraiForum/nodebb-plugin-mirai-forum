@@ -7,6 +7,7 @@
     "scripts": [],
     "acpScripts": [],
     "defaultLang": "en-US",
+    "templates": "views",
     "hooks": [
         {
             "hook": "filter:privileges.posts.edit",
@@ -21,8 +22,16 @@
             "method": "filter:privileges+groups+list_human"
         },
         {
-            "hook": "filter:categories.copyPrivilegesFrom",
-            "method": "copyPrivilegesFrom"
+            "hook": "filter:register.check",
+            "method": "filter:register+check"
+        },
+        {
+            "hook": "filter:admin.header.build",
+            "method": "filter:admin+header+build"
+        },
+        {
+            "hook": "static:app.load",
+            "method": "static:app+load"
         }
     ]
 }
