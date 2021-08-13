@@ -93,7 +93,6 @@ plugin["filter:privileges+posts+edit"] = async function (event) {
 
 plugin["static:app+load"] = async function (params) {
     function renderAdmin(req, res) {
-        console.log("REQ ADMIN");
         res.render(`admin/plugins/mirai-forum/settings.tpl`, {});
     }
 
