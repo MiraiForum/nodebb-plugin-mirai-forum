@@ -140,6 +140,15 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
         return data;
     };
 
+    plugin["filter:composer+formatting"] = async function (data) {
+        data.options.push({
+            name: 'hidden-text',
+            className: 'fa fa-eye-slash',
+            title: 'Hidden text',
+        });
+        return data;
+    };
+
 })();
 
 module.exports = plugin;

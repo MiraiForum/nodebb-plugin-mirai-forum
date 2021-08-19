@@ -51,6 +51,11 @@
         {
             "hook": "filter:parse.raw",
             "method": "filter:parse+post"
+        },
+        {
+            "hook": "filter:composer.formatting",
+            "method": "filter:composer+formatting",
+            "priority": 30
         }
     ]
 }
