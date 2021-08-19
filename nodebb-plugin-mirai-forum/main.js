@@ -5,6 +5,7 @@ const posts = require.main.require('./src/posts');
 const privsPosts = require.main.require('./src/privileges/posts');
 const user = require.main.require('./src/user');
 const Meta = require.main.require('./src/meta');
+const mutils = require('./utils');
 
 plugin["filter:privileges+groups+list"] = function (privileges, callback) {
     privileges.push('groups:topics:edit-reply');
@@ -110,5 +111,35 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
 
     return adminHeader;
 };
+
+(function () {
+    const codeRegex = /\<(pre|code)\>.*?\<\/\1\>/gs;
+    const hiddenPattern = /\+\=\[(.*?)\]\=\+/g;
+
+    // filter:parse+post
+    /**
+     * @param {string} data 
+     */
+    function parse(data) {
+        if (!hiddenPattern.test(data)) return data;
+        return mutils.str_replaceNotMatch(data, codeRegex, (v) => {
+            return v.replace(hiddenPattern, (v2, $1) => {
+                return "<span class='text-hov-hidden'>" + $1 + '</span>';
+            });
+        });
+    }
+
+    plugin["filter:parse+post"] = async function (data) {
+        if (data && 'string' === typeof data) {
+            data = parse(data);
+        } else if (data.postData && data.postData.content) {
+            data.postData.content = parse(data.postData.content);
+        } else if (data.userData && data.userData.signature) {
+            data.userData.signature = parse(data.userData.signature);
+        }
+        return data;
+    };
+
+})();
 
 module.exports = plugin;

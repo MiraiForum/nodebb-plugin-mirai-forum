@@ -1,3 +1,5 @@
 node-modules/
 .idea/
 .vscode/
+
+/nodebb-plugin-mirai-forum/test.js

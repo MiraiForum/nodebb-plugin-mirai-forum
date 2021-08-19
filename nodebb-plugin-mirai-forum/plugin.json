@@ -1,10 +1,17 @@
 {
     "library": "main.js",
-    "less": [],
+    "less": [
+        "assets/css/mirai-forum.less"
+    ],
     "acpLess": [],
     "modules": {},
-    "staticDirs": {},
-    "scripts": [],
+    "staticDirs": {
+        "public": "assets/public"
+    },
+    "languages": "i18n",
+    "scripts": [
+        "assets/public/js/mirai-forum.js"
+    ],
     "acpScripts": [],
     "defaultLang": "en-US",
     "templates": "views",
@@ -32,6 +39,18 @@
         {
             "hook": "static:app.load",
             "method": "static:app+load"
+        },
+        {
+            "hook": "filter:parse.post",
+            "method": "filter:parse+post"
+        },
+        {
+            "hook": "filter:parse.signature",
+            "method": "filter:parse+post"
+        },
+        {
+            "hook": "filter:parse.raw",
+            "method": "filter:parse+post"
         }
     ]
 }
