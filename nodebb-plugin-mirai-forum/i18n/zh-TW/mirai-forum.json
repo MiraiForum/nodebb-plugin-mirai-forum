@@ -1,4 +1,6 @@
 {
     "hidden-message.placeholder": "要隱藏的內容",
-    "hidden-message.title": "你知道得太多了"
+    "hidden-message.title": "你知道得太多了",
+	"folded.text": "顯示/隱藏摺叠内容",
+	"folded.placeholder": "要摺叠的内容"
 }

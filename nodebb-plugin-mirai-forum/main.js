@@ -6,6 +6,7 @@ const privsPosts = require.main.require('./src/privileges/posts');
 const user = require.main.require('./src/user');
 const Meta = require.main.require('./src/meta');
 const mutils = require('./utils');
+const translator = require.main.require('./src/translator');
 
 plugin["filter:privileges+groups+list"] = function (privileges, callback) {
     privileges.push('groups:topics:edit-reply');
@@ -115,27 +116,61 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
 (function () {
     const codeRegex = /\<(pre|code)\>.*?\<\/\1\>/gs;
     const hiddenPattern = /\+\=\[(.*?)\]\=\+/g;
-
-    // filter:parse+post
+	// 折叠 @author MrXiaoM
+	const foldStart = '[fold]';
+	const foldEnd = '[/fold]';
+	
+	// filter:parse+post
     /**
      * @param {string} data 
      */
-    function parse(data) {
-        if (!hiddenPattern.test(data)) return data;
-        return mutils.str_replaceNotMatch(data, codeRegex, (v) => {
+    async function parse(data) {
+		// feature: 折叠，但我这个蠢人只会用蠢方法 @author MrXiaoM
+		var d = data;
+		var i = d.indexOf(foldStart);
+		while (i != -1) {
+			// 寻找 [fold] 并将 [fold] 两边文字分开
+			var temp = d.substring(i + foldStart.length);
+			d = d.substring(0, i);
+			// 寻找 [/fold]
+		    var j = temp.indexOf(foldEnd);
+			if(j != -1) {
+				// 输出的字符串最好不要有换行，避免干扰到获取 lastChild
+				// TODO 我才刚玩 nodebb 没几天，不会玩 i18n，貌似显示有点问题，谁有空就去修下吧
+				var btn_text = await translator.translate('[[mirai-forum:folded.text]]');
+			    var content = '<div class="fold"><button class="fold_button" onclick="' + 
+				   "var content=this.parentNode.lastChild;if(content.style.display=='block'){content.style.display='none';}else{content.style.display='block';}" + 
+				   '">' + btn_text + '</button><div class="fold_content">' + temp.substring(0, j) + '</div></div>';
+				var foot = temp.substring(j + foldEnd.length);
+				d = d + content + foot;
+			}
+			else {
+			    d = d + temp;
+			}
+			// 开始下一轮寻找
+			i = d.indexOf(foldStart);
+		}
+        if (!hiddenPattern.test(d)) return d;
+        else return mutils.str_replaceNotMatch(d, codeRegex, (v) => {
             return v.replace(hiddenPattern, (v2, $1) => {
                 return "<span class='text-hov-hidden'>" + $1 + '</span>';
             });
         });
     }
-
+	
+    plugin["filter:sanitize+config"] = async function (sanitizeConfig) {
+		sanitizeConfig.allowedAttributes['button'] = ['onclick'];
+		sanitizeConfig.allowedClasses['button'] = ['fold_button'];
+        return sanitizeConfig;
+    };
+	
     plugin["filter:parse+post"] = async function (data) {
         if (data && 'string' === typeof data) {
-            data = parse(data);
+            data = await parse(data);
         } else if (data.postData && data.postData.content) {
-            data.postData.content = parse(data.postData.content);
+            data.postData.content = await parse(data.postData.content);
         } else if (data.userData && data.userData.signature) {
-            data.userData.signature = parse(data.userData.signature);
+            data.userData.signature = await parse(data.userData.signature);
         }
         return data;
     };
@@ -145,6 +180,11 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
             name: 'hidden-text',
             className: 'fa fa-eye-slash',
             title: 'Hidden text',
+        });
+		data.options.push({
+            name: 'folded-text',
+            className: 'fa fa-book',
+            title: 'Folded Text',
         });
         return data;
     };

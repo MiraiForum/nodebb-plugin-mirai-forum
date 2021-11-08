@@ -1,4 +1,4 @@
-NodeBB plugin for mirai-forun
+NodeBB plugin for mirai-forum
 
 -----------
 
