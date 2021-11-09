@@ -135,12 +135,7 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
 			// 寻找 [/fold]
 		    var j = temp.indexOf(foldEnd);
 			if(j != -1) {
-				// 输出的字符串最好不要有换行，避免干扰到获取 lastChild
-				// TODO 我才刚玩 nodebb 没几天，不会玩 i18n，貌似显示有点问题，谁有空就去修下吧
-				var btn_text = await translator.translate('[[mirai-forum:folded.text]]');
-			    var content = '<div class="fold"><button class="fold_button" onclick="' + 
-				   "var content=this.parentNode.lastChild;if(content.style.display=='block'){content.style.display='none';}else{content.style.display='block';}" + 
-				   '">' + btn_text + '</button><div class="fold_content">' + temp.substring(0, j) + '</div></div>';
+			    var content = '<div class="fold"><button class="fold-button">...</button><div class="fold-content">' + temp.substring(0, j) + '</div></div>';
 				var foot = temp.substring(j + foldEnd.length);
 				d = d + content + foot;
 			}
@@ -159,8 +154,7 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
     }
 	
     plugin["filter:sanitize+config"] = async function (sanitizeConfig) {
-		sanitizeConfig.allowedAttributes['button'] = ['onclick'];
-		sanitizeConfig.allowedClasses['button'] = ['fold_button'];
+		sanitizeConfig.allowedClasses['button'] = ['fold-button'];
         return sanitizeConfig;
     };
 	

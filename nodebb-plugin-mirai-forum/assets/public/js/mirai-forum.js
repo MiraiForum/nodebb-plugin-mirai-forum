@@ -1,4 +1,12 @@
 (function () {
+	$('button.fold-button').on('click', function() {
+	    var content = $(this).parent('div.fold').children('div.fold-content');
+		if (content.css('display') == 'block'){
+			content.css('display', 'none');
+		} else {
+			content.css('display', 'block');
+		}
+	});
     $(window).on('action:topic.loading', () => {
         require(['components', 'translator'], (components, translator) => {
             let posts = components.get('post');
@@ -6,6 +14,13 @@
             translator.translate('[[mirai-forum:hidden-message.title]]').then((title) => {
                 hid.attr('title', title);
             });
+        });
+		require(['components', 'translator'], (components, translator) => {
+            let posts = components.get('post');
+            let btn = posts.find('.fold-button');
+			translator.translate('[[mirai-forum:folded.text]]').then((title) => {
+                btn.text(title);
+			});
         });
     });
     $(window).on('action:composer.enhanced', (arguments) => {
