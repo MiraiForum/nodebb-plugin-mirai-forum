@@ -1,12 +1,12 @@
 (function () {
-	$('button.fold-button').on('click', function() {
-	    var content = $(this).parent('div.fold').children('div.fold-content');
-		if (content.css('display') == 'block'){
-			content.css('display', 'none');
-		} else {
-			content.css('display', 'block');
-		}
-	});
+    $('button.fold-button').on('click', function() {
+        var content = $(this).parent('div.fold').children('div.fold-content');
+        if (content.css('display') == 'block'){
+            content.css('display', 'none');
+        } else {
+            content.css('display', 'block');
+        }
+    });
     $(window).on('action:topic.loading', () => {
         require(['components', 'translator'], (components, translator) => {
             let posts = components.get('post');
@@ -15,12 +15,12 @@
                 hid.attr('title', title);
             });
         });
-		require(['components', 'translator'], (components, translator) => {
+        require(['components', 'translator'], (components, translator) => {
             let posts = components.get('post');
             let btn = posts.find('.fold-button');
-			translator.translate('[[mirai-forum:folded.text]]').then((title) => {
+            translator.translate('[[mirai-forum:folded.text]]').then((title) => {
                 btn.text(title);
-			});
+            });
         });
     });
     $(window).on('action:composer.enhanced', (arguments) => {
@@ -43,7 +43,7 @@
                             controls.updateTextareaSelection(textarea, selectionStart + 3 + wrapDelta[0], selectionEnd + 3 - wrapDelta[1]);
                         }
                     });
-					
+                    
                     formatting.addButtonDispatch('folded-text', function (textarea, selectionStart, selectionEnd) {
                         if (selectionStart === selectionEnd) {
                             let hov = strings["folded.placeholder"] || 'Content to fold';

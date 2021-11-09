@@ -1,6 +1,6 @@
 {
     "hidden-message.placeholder": "Message to hidden",
     "hidden-message.title": "You know too much",
-	"folded.text": "Show/Hide folded content",
-	"folded.placeholder": "Content to fold"
+    "folded.text": "Show/Hide folded content",
+    "folded.placeholder": "Content to fold"
 }

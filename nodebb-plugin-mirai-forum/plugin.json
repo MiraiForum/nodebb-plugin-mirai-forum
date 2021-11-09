@@ -57,9 +57,9 @@
             "method": "filter:composer+formatting",
             "priority": 30
         },
-		{
-			"hook": "filter:sanitize.config",
-			"method": "filter:sanitize+config"
-		}
+        {
+            "hook": "filter:sanitize.config",
+            "method": "filter:sanitize+config"
+        }
     ]
 }
