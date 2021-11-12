@@ -116,40 +116,28 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
 (function () {
     const codeRegex = /\<(pre|code)\>.*?\<\/\1\>/gs;
     const hiddenPattern = /\+\=\[(.*?)\]\=\+/g;
-    // 折叠 @author MrXiaoM
-    const foldStart = '[fold]';
-    const foldEnd = '[/fold]';
+    const foldedPattern = /\[fold\]([\s\S]*?)\[\/fold\]/g;
     
     // filter:parse+post
     /**
      * @param {string} data 
      */
     function parse(data) {
-        // feature: 折叠，但我这个蠢人只会用蠢方法 @author MrXiaoM
-        var d = data;
-        var i = d.indexOf(foldStart);
-        while (i != -1) {
-            // 寻找 [fold] 并将 [fold] 两边文字分开
-            var temp = d.substring(i + foldStart.length);
-            d = d.substring(0, i);
-            // 寻找 [/fold]
-            var j = temp.indexOf(foldEnd);
-            if(j != -1) {
-                var content = '<div class="fold"><button class="fold-button">...</button><div class="fold-content">' + temp.substring(0, j) + '</div></div>';
-                var foot = temp.substring(j + foldEnd.length);
-                d = d + content + foot;
+        var accessFolded = foldedPattern.test(data);
+        var accessHidden = hiddenPattern.test(data);
+        if(!accessFolded && !accessHidden) return data;
+        return mutils.str_replaceNotMatch(data, codeRegex, (v) => {
+            if (accessFolded) {
+                v = v.replace(foldedPattern, (v2, $1) => {
+                    return '<div class="fold"><button class="fold-button">...</button><div class="fold-content">' + $1 + '</div></div>';
+                });
             }
-            else {
-                d = d + temp;
+            if (accessHidden) {
+                v = v.replace(hiddenPattern, (v2, $1) => {
+                    return "<span class='text-hov-hidden'>" + $1 + '</span>';
+                });
             }
-            // 开始下一轮寻找
-            i = d.indexOf(foldStart);
-        }
-        if (!hiddenPattern.test(d)) return d;
-        else return mutils.str_replaceNotMatch(d, codeRegex, (v) => {
-            return v.replace(hiddenPattern, (v2, $1) => {
-                return "<span class='text-hov-hidden'>" + $1 + '</span>';
-            });
+            return v;
         });
     }
     

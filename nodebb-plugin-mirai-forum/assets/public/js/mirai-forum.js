@@ -1,26 +1,35 @@
 (function () {
-    $('button.fold-button').on('click', function() {
-        var content = $(this).parent('div.fold').children('div.fold-content');
-        if (content.css('display') == 'block'){
-            content.css('display', 'none');
-        } else {
-            content.css('display', 'block');
-        }
-    });
+    // TODO: 以后要可能对编辑器更新预览、编辑帖子的内容后等部分进行翻译
+    // 为了避免复制粘贴代码，先把翻译部分分离出来
+    var translateHiddenText = function(translator, hid){
+        translator.translate('[[mirai-forum:hidden-message.title]]').then((title) => {
+            hid.attr('title', title);
+        });
+    };
+    var translateFoldButton = function(translator, btn){
+        translator.translate('[[mirai-forum:folded.text]]').then((title) => {
+            btn.text(title);
+            // 翻译时顺便加入点击事件到按钮
+            btn.on('click', function() {
+                var content = $(this).parent('div.fold').children('div.fold-content');
+                if (content.css('display') == 'block'){
+                    content.css('display', 'none');
+                } else {
+                    content.css('display', 'block');
+                }
+            });
+        });
+    };
     $(window).on('action:topic.loading', () => {
         require(['components', 'translator'], (components, translator) => {
             let posts = components.get('post');
             let hid = posts.find('.text-hov-hidden');
-            translator.translate('[[mirai-forum:hidden-message.title]]').then((title) => {
-                hid.attr('title', title);
-            });
+            translateHiddenText(translator, hid);
         });
         require(['components', 'translator'], (components, translator) => {
             let posts = components.get('post');
             let btn = posts.find('.fold-button');
-            translator.translate('[[mirai-forum:folded.text]]').then((title) => {
-                btn.text(title);
-            });
+            translateFoldButton(translator, btn);
         });
     });
     $(window).on('action:composer.enhanced', (arguments) => {
