@@ -1,14 +1,42 @@
 (function () {
-    $(window).on('action:topic.loading', () => {
-        require(['components', 'translator'], (components, translator) => {
-            let posts = components.get('post');
-            let hid = posts.find('.text-hov-hidden');
+    function setupPost(post) {
+        require([
+            'translator'
+        ], (
+            translator
+        ) => {
+
+            let hid = post.find('.text-hov-hidden');
             translator.translate('[[mirai-forum:hidden-message.title]]').then((title) => {
                 hid.attr('title', title);
             });
 
         });
+    }
+
+    function fireSetupOfPost(pid) {
+        let post0 = $('[component="post"][data-pid="' + pid + '"]');
+        setupPost(post0);
+    }
+
+    $(window).on('action:topic.loading', () => {
+        require(['components'], (components) => {
+            let posts = components.get('post');
+            setupPost(posts)
+        });
     });
+    $(window).on('action:posts.edited', function (e0, data) {
+        // console.log('action:posts.edited', arguments);
+        fireSetupOfPost(data.post.pid)
+    });
+    $(window).on('action:posts.loaded', function (e0, data) {
+        // console.log('action:posts.loaded', arguments)
+        // '[component="post"][data-pid="' + pid + '"]'
+        // [1].posts[0].pid
+        for (let post of data.posts) {
+            fireSetupOfPost(post.pid)
+        }
+    })
     $(window).on('action:composer.enhanced', (arguments) => {
         console.log(arguments);
         require([
