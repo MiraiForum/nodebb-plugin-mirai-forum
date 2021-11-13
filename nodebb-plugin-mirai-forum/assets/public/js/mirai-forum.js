@@ -1,4 +1,12 @@
 (function () {
+    var onFoldBtnClick = function() {
+        var content = $(this).parent('div.fold').children('div.fold-content');
+        if (content.css('display') == 'block'){
+            content.css('display', 'none');
+        } else {
+            content.css('display', 'block');
+        }
+    }
     function setupPost(post) {
         require(['translator'], (translator) => {
             let hid = post.find('.text-hov-hidden');
@@ -8,15 +16,9 @@
             let btn = post.find('.fold-button');
             translator.translate('[[mirai-forum:folded.text]]').then((title) => {
                 btn.text(title);
-                // 翻译时顺便加入点击事件到按钮
-                btn.on('click', function() {
-                    var content = $(this).parent('div.fold').children('div.fold-content');
-                    if (content.css('display') == 'block'){
-                        content.css('display', 'none');
-                    } else {
-                        content.css('display', 'block');
-                    }
-                });
+                // 翻译时顺便加入点击事件到按钮，并避免重复添加事件
+                btn.off('click', onFoldBtnClick);
+                btn.on('click', onFoldBtnClick);
             });
         });
     }
