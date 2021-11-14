@@ -56,6 +56,10 @@
             "hook": "filter:composer.formatting",
             "method": "filter:composer+formatting",
             "priority": 30
+        },
+        {
+            "hook": "filter:composer.help",
+            "method": "filter:composer+help"
         }
     ]
 }
