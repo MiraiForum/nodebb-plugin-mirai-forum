@@ -60,6 +60,10 @@
         {
             "hook": "filter:sanitize.config",
             "method": "filter:sanitize+config"
+        },
+        {
+            "hook": "filter:composer.help",
+            "method": "filter:composer+help"
         }
     ]
 }

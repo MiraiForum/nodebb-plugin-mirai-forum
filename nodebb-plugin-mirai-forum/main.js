@@ -168,6 +168,16 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
         return data;
     };
 
+    plugin["filter:composer+help"] = async function (helpContent) {
+
+        helpContent += "<hr/>";
+
+        helpContent += "<h2>Hidden text</h2>"
+        helpContent += "<code>+=[ [[mirai-forum:hidden-message.placeholder]] ]=+</code><br/>"
+        helpContent += parse("+=[[[mirai-forum:hidden-message.placeholder]]]=+");
+
+        return helpContent;
+    }
 })();
 
 module.exports = plugin;
