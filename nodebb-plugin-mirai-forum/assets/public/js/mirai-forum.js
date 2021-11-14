@@ -1,16 +1,43 @@
 (function () {
-    function setupPost(post) {
-        require([
-            'translator'
-        ], (
-            translator
-        ) => {
+    function folden_onButtonClick() {
+        var content = $(this).parent('div.fold').children('div.fold-content');
+        if (content.css('display') == 'block') {
+            content.css('display', 'none');
+        } else {
+            content.css('display', 'block');
+        }
+    }
 
+    function folden_registerButtonClickHandler(btn) {
+        let btn0 = $(btn);
+        if (btn0.attr('folden-handler-registered') == undefined) {
+            btn0.on('click', folden_onButtonClick);
+            btn0.attr('folden-handler-registered', '1');
+        }
+    }
+
+    let miraiForumPublic = window.miraiForumPublic = {};
+    /**
+     * @param {HTMLButtonElement} btn 
+     */
+    miraiForumPublic.onFoldButtonClick = function (btn) {
+        btn.removeEventListener('click', miraiForumPublic.onFoldButtonClick);
+        btn.onclick = null;
+        folden_registerButtonClickHandler(btn);
+        folden_onButtonClick.apply(btn);
+    }
+
+    function setupPost(post) {
+        require(['translator'], (translator) => {
             let hid = post.find('.text-hov-hidden');
             translator.translate('[[mirai-forum:hidden-message.title]]').then((title) => {
                 hid.attr('title', title);
             });
-
+            let btn = post.find('.fold-button');
+            folden_registerButtonClickHandler(btn);
+            translator.translate('[[mirai-forum:folded.text]]').then((title) => {
+                btn.text(title);
+            });
         });
     }
 
@@ -58,6 +85,16 @@
                         }
                     });
 
+                    formatting.addButtonDispatch('folded-text', function (textarea, selectionStart, selectionEnd) {
+                        if (selectionStart === selectionEnd) {
+                            let hov = strings["folded.placeholder"] || 'Content to fold';
+                            controls.insertIntoTextarea(textarea, '[fold]' + hov + '[/fold]');
+                            controls.updateTextareaSelection(textarea, selectionStart + 6, selectionEnd + hov.length + 6);
+                        } else {
+                            var wrapDelta = controls.wrapSelectionInTextareaWith(textarea, '[fold]', '[/fold]');
+                            controls.updateTextareaSelection(textarea, selectionStart + 6 + wrapDelta[0], selectionEnd + 6 - wrapDelta[1]);
+                        }
+                    });
                 });
             }
         });

@@ -26,7 +26,7 @@ async function getPostOwner(pid) {
 
 /**
  * @param {string | undefined | null} value
- * @returns {string}
+ * @returns {string} 
  */
 function stringSafe(value) {
     if (value == undefined) return "";
@@ -116,23 +116,41 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
 
 (function () {
     const hiddenPattern = /\+\=\[(.*?)\]\=\+/g;
+    const foldedPattern = /\<blockquote\>(?:\s*)\<p (?:.*?)\>\^fold<\/p>(.*?)\<\/blockquote\>/gs;
 
     // filter:parse+post
     /**
-     * @param {string} data
+     * @param {string} data 
      */
     function parse(data) {
         if (isDev) {
             console.log('PARSING: Parsing ', data);
         }
-        if (!hiddenPattern.test(data)) return data;
-        return mutils.str_earse_code(data, (v) => {
+        let mfCustomMdUsed = hiddenPattern.test(data)
+            || foldedPattern.test(data)
+            ;
+
+        if (!mfCustomMdUsed) return data;
+
+        let rsp = mutils.str_earse_code(data, (v) => {
+            v = v.replace(foldedPattern, (v2, $1) => {
+                return '<div class="fold"><button class="fold-button" onclick="miraiForumPublic.onFoldButtonClick(this)">...</button><div class="fold-content">' + $1 + '</div></div>';
+            });
             v = v.replace(hiddenPattern, (v2, $1) => {
                 return "<span class='text-hov-hidden'>" + $1 + '</span>';
             });
             return v;
         });
+        if (isDev) {
+            console.log('RSP', rsp);
+        }
+        return rsp;
     }
+
+    plugin["filter:sanitize+config"] = async function (sanitizeConfig) {
+        sanitizeConfig.allowedClasses['button'] = ['fold-button'];
+        return sanitizeConfig;
+    };
 
     plugin["filter:parse+post"] = async function (data) {
         if (data && 'string' === typeof data) {
@@ -151,16 +169,33 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
             className: 'fa fa-eye-slash',
             title: 'Hidden text',
         });
+        data.options.push({
+            name: 'folded-text',
+            className: 'fa fa-book',
+            title: 'Folded Text',
+        });
         return data;
     };
 
     plugin["filter:composer+help"] = async function (helpContent) {
 
-        helpContent += "<hr/>";
+        helpContent += "<hr/>"
 
-        helpContent += "<h2>Hidden text</h2>"
+        helpContent += "<h4>Hidden text</h4>"
         helpContent += "<code>+=[ [[mirai-forum:hidden-message.placeholder]] ]=+</code><br/>"
-        helpContent += parse("+=[[[mirai-forum:hidden-message.placeholder]]]=+");
+        helpContent += parse("+=[[[mirai-forum:hidden-message.placeholder]]]=+")
+
+
+        helpContent += "<hr/>"
+        helpContent += "<h4>Folden</h4>"
+        helpContent += `<pre><code>&gt; ^fold
+&gt;
+&gt; Some message to folden
+</code></pre>`
+        helpContent += parse(`<blockquote>
+<p dir="auto">^fold</p>
+Some message to folden
+</blockquote>`)
 
         return helpContent;
     }
