@@ -6,6 +6,8 @@ const privsPosts = require.main.require('./src/privileges/posts');
 const user = require.main.require('./src/user');
 const Meta = require.main.require('./src/meta');
 const mutils = require('./utils');
+const isDev = global.env === 'development';
+
 
 plugin["filter:privileges+groups+list"] = function (privileges, callback) {
     privileges.push('groups:topics:edit-reply');
@@ -24,7 +26,7 @@ async function getPostOwner(pid) {
 
 /**
  * @param {string | undefined | null} value
- * @returns {string} 
+ * @returns {string}
  */
 function stringSafe(value) {
     if (value == undefined) return "";
@@ -113,19 +115,22 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
 };
 
 (function () {
-    const codeRegex = /\<(pre|code)\>.*?\<\/\1\>/gs;
     const hiddenPattern = /\+\=\[(.*?)\]\=\+/g;
 
     // filter:parse+post
     /**
-     * @param {string} data 
+     * @param {string} data
      */
     function parse(data) {
+        if (isDev) {
+            console.log('PARSING: Parsing ', data);
+        }
         if (!hiddenPattern.test(data)) return data;
-        return mutils.str_replaceNotMatch(data, codeRegex, (v) => {
-            return v.replace(hiddenPattern, (v2, $1) => {
+        return mutils.str_earse_code(data, (v) => {
+            v = v.replace(hiddenPattern, (v2, $1) => {
                 return "<span class='text-hov-hidden'>" + $1 + '</span>';
             });
+            return v;
         });
     }
 

@@ -1,3 +1,11 @@
+
+const codeRegex = /\<(pre|code)\>.*?\<\/\1\>/gs;
+const code_tmpPlaceHolderRegex = /\!\!CCDC_\#(?:.+?)\#/g
+
+function cholder() {
+    return "!!CCDC_#" + Date.now() + Math.random() + "#";
+}
+
 module.exports = {
     /**
      * @param {string} src 
@@ -19,5 +27,28 @@ module.exports = {
         });
         result.push(replacer(src.substring(start)));
         return result.join("");
+    },
+    /**
+     * @param {string} src 
+     * @param { (s: string) => string } processor
+     * @returns {string} 
+     */
+    str_earse_code: function (src, processor) {
+        let rsp = src;
+        let storages = {};
+        rsp = rsp.replace(codeRegex, (v) => {
+            let id = cholder();
+            storages[id] = v;
+            return id;
+        });
+
+        rsp = processor(rsp);
+        rsp = rsp.replace(code_tmpPlaceHolderRegex, (v) => {
+            let tmp = storages[v];
+            if (tmp === undefined) { return '$$ERROR_CODE_NOT_FOUND$$'; }
+            return tmp
+        })
+
+        return rsp;
     },
 };
