@@ -116,7 +116,7 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
 
 (function () {
     const hiddenPattern = /\+\=\[(.*?)\]\=\+/g;
-    const foldedPattern = /\[fold\]([\s\S]*?)\[\/fold\]/g;
+    const foldedPattern = /\<blockquote\>(?:\s*)\<p (?:.*?)\>\^fold<\/p>(.*?)\<\/blockquote\>/gs;
 
     // filter:parse+post
     /**
@@ -128,8 +128,8 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
         }
         if (!hiddenPattern.test(data)) return data;
         return mutils.str_earse_code(data, (v) => {
-            v = v.replace(hiddenPattern, (v2, $1) => {
-                return "<span class='text-hov-hidden'>" + $1 + '</span>';
+            v = v.replace(foldedPattern, (v2, $1) => {
+                return '<div class="fold"><button class="fold-button">...</button><div class="fold-content">' + $1 + '</div></div>';
             });
             v = v.replace(hiddenPattern, (v2, $1) => {
                 return "<span class='text-hov-hidden'>" + $1 + '</span>';
