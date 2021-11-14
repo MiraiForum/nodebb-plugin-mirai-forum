@@ -3,13 +3,6 @@
     "version": "1.0.0",
     "description": "Hi",
     "main": "main.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/KasukuSakura/nodebb-plugin-mirai-forum"
-    },
-    "bugs": {
-        "url": "https://github.com/KasukuSakura/nodebb-plugin-mirai-forum/issues"
-    },
     "nbbpm": {
       "compatibility": "^1.15.0"
     }
