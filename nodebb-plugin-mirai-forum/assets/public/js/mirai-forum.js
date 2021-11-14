@@ -1,12 +1,32 @@
 (function () {
-    var onFoldBtnClick = function() {
+    function folden_onButtonClick() {
         var content = $(this).parent('div.fold').children('div.fold-content');
-        if (content.css('display') == 'block'){
+        if (content.css('display') == 'block') {
             content.css('display', 'none');
         } else {
             content.css('display', 'block');
         }
     }
+
+    function folden_registerButtonClickHandler(btn) {
+        let btn0 = $(btn);
+        if (btn0.attr('folden-handler-registered') == undefined) {
+            btn0.on('click', folden_onButtonClick);
+            btn0.attr('folden-handler-registered', '1');
+        }
+    }
+
+    let miraiForumPublic = window.miraiForumPublic = {};
+    /**
+     * @param {HTMLButtonElement} btn 
+     */
+    miraiForumPublic.onFoldButtonClick = function (btn) {
+        btn.removeEventListener('click', miraiForumPublic.onFoldButtonClick);
+        btn.onclick = null;
+        folden_registerButtonClickHandler(btn);
+        folden_onButtonClick.apply(btn);
+    }
+
     function setupPost(post) {
         require(['translator'], (translator) => {
             let hid = post.find('.text-hov-hidden');
@@ -14,11 +34,9 @@
                 hid.attr('title', title);
             });
             let btn = post.find('.fold-button');
+            folden_registerButtonClickHandler(btn);
             translator.translate('[[mirai-forum:folded.text]]').then((title) => {
                 btn.text(title);
-                // 翻译时顺便加入点击事件到按钮，并避免重复添加事件
-                btn.off('click', onFoldBtnClick);
-                btn.on('click', onFoldBtnClick);
             });
         });
     }
@@ -66,7 +84,7 @@
                             controls.updateTextareaSelection(textarea, selectionStart + 3 + wrapDelta[0], selectionEnd + 3 - wrapDelta[1]);
                         }
                     });
-                    
+
                     formatting.addButtonDispatch('folded-text', function (textarea, selectionStart, selectionEnd) {
                         if (selectionStart === selectionEnd) {
                             let hov = strings["folded.placeholder"] || 'Content to fold';

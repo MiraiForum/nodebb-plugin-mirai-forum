@@ -126,16 +126,25 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
         if (isDev) {
             console.log('PARSING: Parsing ', data);
         }
-        if (!hiddenPattern.test(data)) return data;
-        return mutils.str_earse_code(data, (v) => {
+        let mfCustomMdUsed = hiddenPattern.test(data)
+            || foldedPattern.test(data)
+            ;
+
+        if (!mfCustomMdUsed) return data;
+
+        let rsp = mutils.str_earse_code(data, (v) => {
             v = v.replace(foldedPattern, (v2, $1) => {
-                return '<div class="fold"><button class="fold-button">...</button><div class="fold-content">' + $1 + '</div></div>';
+                return '<div class="fold"><button class="fold-button" onclick="miraiForumPublic.onFoldButtonClick(this)">...</button><div class="fold-content">' + $1 + '</div></div>';
             });
             v = v.replace(hiddenPattern, (v2, $1) => {
                 return "<span class='text-hov-hidden'>" + $1 + '</span>';
             });
             return v;
         });
+        if (isDev) {
+            console.log('RSP', rsp);
+        }
+        return rsp;
     }
 
     plugin["filter:sanitize+config"] = async function (sanitizeConfig) {
@@ -170,11 +179,23 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
 
     plugin["filter:composer+help"] = async function (helpContent) {
 
-        helpContent += "<hr/>";
+        helpContent += "<hr/>"
 
-        helpContent += "<h2>Hidden text</h2>"
+        helpContent += "<h4>Hidden text</h4>"
         helpContent += "<code>+=[ [[mirai-forum:hidden-message.placeholder]] ]=+</code><br/>"
-        helpContent += parse("+=[[[mirai-forum:hidden-message.placeholder]]]=+");
+        helpContent += parse("+=[[[mirai-forum:hidden-message.placeholder]]]=+")
+
+
+        helpContent += "<hr/>"
+        helpContent += "<h4>Folden</h4>"
+        helpContent += `<pre><code>&gt; ^fold
+&gt;
+&gt; Some message to folden
+</code></pre>`
+        helpContent += parse(`<blockquote>
+<p dir="auto">^fold</p>
+Some message to folden
+</blockquote>`)
 
         return helpContent;
     }
