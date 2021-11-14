@@ -6,7 +6,8 @@ const privsPosts = require.main.require('./src/privileges/posts');
 const user = require.main.require('./src/user');
 const Meta = require.main.require('./src/meta');
 const mutils = require('./utils');
-const translator = require.main.require('./src/translator');
+const isDev = global.env === 'development';
+
 
 plugin["filter:privileges+groups+list"] = function (privileges, callback) {
     privileges.push('groups:topics:edit-reply');
@@ -114,38 +115,34 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
 };
 
 (function () {
-    const codeRegex = /\<(pre|code)\>.*?\<\/\1\>/gs;
     const hiddenPattern = /\+\=\[(.*?)\]\=\+/g;
     const foldedPattern = /\[fold\]([\s\S]*?)\[\/fold\]/g;
-    
+
     // filter:parse+post
     /**
      * @param {string} data 
      */
     function parse(data) {
-        var accessFolded = foldedPattern.test(data);
-        var accessHidden = hiddenPattern.test(data);
-        if(!accessFolded && !accessHidden) return data;
-        return mutils.str_replaceNotMatch(data, codeRegex, (v) => {
-            if (accessFolded) {
-                v = v.replace(foldedPattern, (v2, $1) => {
-                    return '<div class="fold"><button class="fold-button">...</button><div class="fold-content">' + $1 + '</div></div>';
-                });
-            }
-            if (accessHidden) {
-                v = v.replace(hiddenPattern, (v2, $1) => {
-                    return "<span class='text-hov-hidden'>" + $1 + '</span>';
-                });
-            }
+        if (isDev) {
+            console.log('PARSING: Parsing ', data);
+        }
+        if (!hiddenPattern.test(data)) return data;
+        return mutils.str_earse_code(data, (v) => {
+            v = v.replace(hiddenPattern, (v2, $1) => {
+                return "<span class='text-hov-hidden'>" + $1 + '</span>';
+            });
+            v = v.replace(hiddenPattern, (v2, $1) => {
+                return "<span class='text-hov-hidden'>" + $1 + '</span>';
+            });
             return v;
         });
     }
-    
+
     plugin["filter:sanitize+config"] = async function (sanitizeConfig) {
         sanitizeConfig.allowedClasses['button'] = ['fold-button'];
         return sanitizeConfig;
     };
-    
+
     plugin["filter:parse+post"] = async function (data) {
         if (data && 'string' === typeof data) {
             data = parse(data);
