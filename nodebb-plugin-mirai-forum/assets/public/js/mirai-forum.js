@@ -88,11 +88,11 @@
                     formatting.addButtonDispatch('folded-text', function (textarea, selectionStart, selectionEnd) {
                         if (selectionStart === selectionEnd) {
                             let hov = strings["folded.placeholder"] || 'Content to fold';
-                            controls.insertIntoTextarea(textarea, '[fold]' + hov + '[/fold]');
-                            controls.updateTextareaSelection(textarea, selectionStart + 6, selectionEnd + hov.length + 6);
+                            controls.insertIntoTextarea(textarea, '> ^fold\n>\n> ' + hov + '\n>');
+                            controls.updateTextareaSelection(textarea, selectionStart + 12, selectionEnd + hov.length + 2);
                         } else {
-                            var wrapDelta = controls.wrapSelectionInTextareaWith(textarea, '[fold]', '[/fold]');
-                            controls.updateTextareaSelection(textarea, selectionStart + 6 + wrapDelta[0], selectionEnd + 6 - wrapDelta[1]);
+                            var wrapDelta = controls.wrapSelectionInTextareaWith(textarea, '> ^fold\n>\n> ', '\n>');
+                            controls.updateTextareaSelection(textarea, selectionStart + 12 + wrapDelta[0], selectionEnd + 2 - wrapDelta[1]);
                         }
                     });
                 });
