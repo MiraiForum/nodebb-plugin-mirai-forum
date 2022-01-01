@@ -116,8 +116,7 @@ plugin["filter:admin+header+build"] = async function (adminHeader) {
 
 (function () {
     const hiddenPattern = /\+\=\[(.*?)\]\=\+/g;
-    const foldedPattern = /\<blockquote\>(?:\s*)\<p (?:.*?)\>\^fold<\/p>(.*?)\<\/blockquote\>/gs;
-
+    const foldedPattern = /\<blockquote\>(?:\s*)\<p (?:.*?)\>\^fold\<\/p\>([\s\S]*?)\<\/blockquote\>/g;
     // filter:parse+post
     /**
      * @param {string} data 
