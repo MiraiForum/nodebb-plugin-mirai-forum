@@ -38,7 +38,7 @@ function stringSafe(value) {
 plugin['filter:user+saveEmail'] = async function (event) {
 
     if (isDev) console.log(event);
-    if (event.caller && event.uid != event.caller.uid) { // Modify by admin
+    if (!event.registration && event.caller && event.uid != event.caller.uid) { // Modify by admin
         return event;
     }
 
@@ -49,6 +49,7 @@ plugin['filter:user+saveEmail'] = async function (event) {
 
         if (RegExp(rule, 'i').test(event.email)) {
             event.allowed = false;
+            return event;
         }
     }
     return event;
