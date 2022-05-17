@@ -7,7 +7,9 @@ const user = require.main.require('./src/user');
 const Meta = require.main.require('./src/meta');
 const mutils = require('./utils');
 const isDev = global.env === 'development';
-
+const routeHelpers = require.main.require('./src/routes/helpers');
+const settings = require.main.require("./src/meta/settings");
+let mf_settings = {};
 
 plugin["filter:privileges+groups+list"] = function (privileges, callback) {
     privileges.push('groups:topics:edit-reply');
@@ -33,13 +35,31 @@ function stringSafe(value) {
     return value.replace('\r\n', '\n').replace('\r', '\n')
 }
 
+plugin['filter:user+saveEmail'] = async function (event) {
+
+    if (isDev) console.log(event);
+    if (event.caller && event.uid != event.caller.uid) { // Modify by admin
+        return event;
+    }
+
+    let bl = stringSafe(mf_settings['email-blacklist']);
+
+    for (let rule of bl.split('\n')) {
+        if (rule.trim().length == 0) continue;
+
+        if (RegExp(rule, 'i').test(event.email)) {
+            event.allowed = false;
+        }
+    }
+    return event;
+};
+
 plugin["filter:register+check"] = async function (event) {
 
     /**
      * @type {string}
      */
-    let bl = await Meta.configs.get("mirai-forum:username-blacklist");
-    bl = stringSafe(bl);
+    let bl = stringSafe(mf_settings['username-blacklist']);
 
     for (let rule of bl.split('\n')) {
         if (rule.trim().length == 0) continue;
@@ -48,9 +68,9 @@ plugin["filter:register+check"] = async function (event) {
             throw Error("Invalid username");
         }
     }
+    if (!event.userData.email) return event;
 
-    bl = await Meta.configs.get("mirai-forum:email-blacklist");
-    bl = stringSafe(bl);
+    bl = stringSafe(mf_settings['email-blacklist']);
 
     for (let rule of bl.split('\n')) {
         if (rule.trim().length == 0) continue;
@@ -96,14 +116,32 @@ plugin["filter:privileges+posts+edit"] = async function (event) {
 
 plugin["static:app+load"] = async function (params) {
     function renderAdmin(req, res) {
-        res.render(`admin/plugins/mirai-forum/settings.tpl`, {});
+        res.render(`admin/plugins/mirai-forum-addon`, {});
     }
 
-    params.router.get(`/admin/plugins/mirai-forum-addon`, params.middleware.admin.buildHeader, renderAdmin);
-    params.router.get(`/api/admin/plugins/mirai-forum-addon`, renderAdmin);
+    const {
+        router,
+        middleware/* , controllers */
+    } = params;
+
+    routeHelpers.setupAdminPageRoute(router, '/admin/plugins/mirai-forum-addon', middleware, [], renderAdmin);
+
+    mf_settings = await settings.get('mfa-settings');
+    if (isDev) {
+        console.log("MF Settings", mf_settings);
+    }
 
     return params;
 };
+plugin["action:settings+set"] = async function (params) {
+    let old = mf_settings;
+
+    mf_settings = await settings.get('mfa-settings') || old;
+    if (isDev) {
+        console.log("MF Settings", mf_settings);
+    }
+
+}
 
 plugin["filter:admin+header+build"] = async function (adminHeader) {
     adminHeader.plugins.push({

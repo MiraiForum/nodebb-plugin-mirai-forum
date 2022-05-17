@@ -3,3 +3,7 @@ node-modules/
 .vscode/
 
 /nodebb-plugin-mirai-forum/test.js
+/*.bat
+/*.code-workspace
+/0.*.txt
+

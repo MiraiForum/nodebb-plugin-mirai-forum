@@ -4,7 +4,9 @@
         "assets/css/mirai-forum.less"
     ],
     "acpLess": [],
-    "modules": {},
+    "modules": {
+        "../admin/plugins/mirai-forum-addon.js": "assets/public/js/admin.js"
+    },
     "staticDirs": {
         "public": "assets/public"
     },
@@ -31,6 +33,14 @@
         {
             "hook": "filter:register.check",
             "method": "filter:register+check"
+        },
+        {
+            "hook": "action:settings.set",
+            "method": "action:settings+set"
+        },
+        {
+            "hook": "filter:user.saveEmail",
+            "method": "filter:user+saveEmail"
         },
         {
             "hook": "filter:admin.header.build",
