@@ -5,7 +5,8 @@
     ],
     "acpLess": [],
     "modules": {
-        "../admin/plugins/mirai-forum-addon.js": "assets/public/js/admin.js"
+        "../admin/plugins/mirai-forum-addon.js": "assets/public/js/admin.js",
+        "../admin/plugins/mirai-forum/settings.js": "assets/public/js/admin.js"
     },
     "staticDirs": {
         "public": "assets/public"
